@@ -1,0 +1,102 @@
+package Autodesk.ADN.Android.DroidView;
+
+import javax.microedition.khronos.opengles.GL10;
+import android.content.Context;
+import android.opengl.GLU;
+import android.os.SystemClock;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+public class GLIdleModel 
+	extends GLModel
+{
+	float _angle;
+	
+	HiTimer _hiTimer;
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	//
+	//
+	//////////////////////////////////////////////////////////////////////////////////////
+	public GLIdleModel(Context context, AdnMeshData[] data) 
+	{
+		super(context, data);
+		
+		_angle = 0.0f;
+		
+		_hiTimer = new HiTimer();
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	//
+	//
+	//////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public void Initialize(GL10 gl, Context context) 
+	{
+		super.Initialize(gl, context);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	//
+	//
+	//////////////////////////////////////////////////////////////////////////////////////
+	public void draw_model(GL10 gl)
+	{
+		gl.glPushMatrix();		
+		
+		gl.glRotatef(_angle, 0, 1, 0);
+		
+		super.draw(gl);
+		
+		gl.glPopMatrix();
+	}
+	
+	@Override
+	public void draw(GL10 gl)
+	{
+		_angle += 50.0 * _hiTimer.GetElapsedSeconds();
+		
+		GLU.gluLookAt(
+				gl, 
+				0, 2, 5, //Eye
+				0, 0, 0, //Target
+				0, 1, 0);//Up vector
+		
+		gl.glPushMatrix();	
+		
+		gl.glTranslatef(0, 5, 0);
+		
+		draw_model(gl);
+		
+		gl.glPopMatrix();	
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	//
+	//
+	//////////////////////////////////////////////////////////////////////////////////////
+	class HiTimer
+	{
+		long _lastCall;
+		
+		public HiTimer()
+		{
+			_lastCall = SystemClock.elapsedRealtime();
+		}
+		
+		public float GetElapsedSeconds()
+		{
+			long current = SystemClock.elapsedRealtime();
+			
+			long elapsedMs = current - _lastCall;
+			
+			_lastCall = current;
+			
+			return elapsedMs * 0.001f;
+		}
+	}
+}
+
